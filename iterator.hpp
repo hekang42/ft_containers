@@ -1,6 +1,6 @@
 #ifndef ITERATOR
 #define ITERATOR
-#include <iterator>
+// #include <iterator>
 namespace ft {
 template < class Iterator >
 class iterator_traits {
@@ -61,7 +61,7 @@ class reverse_iterator {
     iterator_type iter = current;
     return *--iter;
   };
-  pointer operator->() const { return _VSTD::addressof(operator*()); };
+  pointer operator->() const { return &(operator*()) };
   reverse_iterator& operator++() {
     --current;
     return *this;

@@ -76,29 +76,108 @@
 // }
 
 // lexicographical_compare example
-#include <iostream>     // std::cout, std::boolalpha
-#include <algorithm>    // std::lexicographical_compare
-#include <cctype>       // std::tolower
+// #include <iostream>     // std::cout, std::boolalpha
+// #include <algorithm>    // std::lexicographical_compare
+// #include <cctype>       // std::tolower
 
-// a case-insensitive comparison function:
-bool mycomp (char c1, char c2)
-{ return std::tolower(c1)<std::tolower(c2); }
+// // a case-insensitive comparison function:
+// bool mycomp (char c1, char c2)
+// { return std::tolower(c1)<std::tolower(c2); }
 
-int main () {
-  char foo[]="Apple";
-  char bar[]="apartment";
+// int main () {
+//   char foo[]="Apple";
+//   char bar[]="apartment";
 
-  std::cout << std::boolalpha;
+//   std::cout << std::boolalpha;
 
-  std::cout << "Comparing foo and bar lexicographically (foo<bar):\n";
+//   std::cout << "Comparing foo and bar lexicographically (foo<bar):\n";
 
-  std::cout << "Using default comparison (operator<): ";
-  std::cout << ft::lexicographical_compare(foo,foo+5,bar,bar+9);
-  std::cout << '\n';
+//   std::cout << "Using default comparison (operator<): ";
+//   std::cout << ft::lexicographical_compare(foo,foo+5,bar,bar+9);
+//   std::cout << '\n';
 
-  std::cout << "Using mycomp as comparison object: ";
-  std::cout << ft::lexicographical_compare(foo,foo+5,bar,bar+9,mycomp);
-  std::cout << '\n';
+//   std::cout << "Using mycomp as comparison object: ";
+//   std::cout << ft::lexicographical_compare(foo,foo+5,bar,bar+9,mycomp);
+//   std::cout << '\n';
+
+//   return 0;
+// }
+
+// #include <vector>
+// #include <iostream>
+// using namespace std;
+// int main()
+// {
+//     vector<int> v1;
+//     v1.push_back(10);
+//     v1.push_back(20);
+//     v1.push_back(30);
+//     v1.push_back(40);
+
+//     vector<int> v2;
+    
+//      v2.push_back(100);
+//      v2.push_back(200);
+//      v2.push_back(300);
+//      v2.push_back(300);
+//      v2.push_back(300);
+//      v2.push_back(300);
+    
+//     for(vector<int>::size_type i=0; i<v1.size(); i++)
+//         cout << v1[i] << ", " << v2[i] << endl;
+//     cout << endl;
+    
+//     v1.swap(v2); //v1과 v2를 스왑
+    
+//     for(vector<int>::size_type i=0; i<v1.size(); i++)
+//         cout << v1[i] << ", " << v2[i] << endl;
+//     cout << endl;
+    
+//     return 0;
+// }
+
+// vector::empty
+// #include <iostream>
+// #include <vector>
+// #include "vector.hpp"
+
+// int main ()
+// {
+//   ft::vector<int> myvector;
+//   int sum (0);
+
+//   for (int i=1;i<=10;i++) myvector.push_back(i);
+
+//   while (!myvector.empty())
+//   {
+//      sum += myvector.back();
+//      myvector.pop_back();
+//   }
+
+//   std::cout << "total: " << sum << '\n';
+
+//   return 0;
+// }
+
+#include <iostream>
+#include <vector>
+#include "vector.hpp"
+
+int main ()
+{
+  ft::vector<int> myvector;
+  int sum (0);
+  myvector.push_back (100);
+  myvector.push_back (200);
+  myvector.push_back (300);
+
+  while (!myvector.empty())
+  {
+    sum+=myvector.back();
+    myvector.pop_back();
+  }
+
+  std::cout << "The elements of myvector add up to " << sum << '\n';
 
   return 0;
 }
