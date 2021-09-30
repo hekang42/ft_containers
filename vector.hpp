@@ -109,10 +109,10 @@ class vector {
   size_type size() const { return _size; }
   size_type max_size() const { return _allocator.max_size(); }
   void resize(size_type n, value_type val = value_type()) {
-    if (_capacity < n) insert(this->end(), n - _size, val);
+    if (_capacity < n)
+      insert(this->end(), n - _size, val);
     else
-      for (int i=0; n+ i < _size; ++i)
-        _allocator.destroy(&data[i]);
+      for (int i = 0; n + i < _size; ++i) _allocator.destroy(&data[i]);
   };
   size_type capacity() const { return _capacity; }
 
@@ -129,6 +129,16 @@ class vector {
     data = temp;
     _capacity = n;
   }
+
+  /* Element access */
+  T &operator[](int const i) { return data[i]; }
+  T &operator[](int i) const { return data[i]; }
+  T &at(const int i) { return data[i]; }
+
+  reference back() { return data[_size - 1]; };
+  const_reference back() const { return data[_size - 1]; };
+  reference front() { return data[0]; };
+  const_reference front() const { return data[9]; };
 
   iterator insert(iterator position, const value_type &val) {
     size_type pos = position.p - data;
@@ -164,7 +174,7 @@ class vector {
     shift_elem_back(pos, n);
     _size += n;
     for (size_type i = 0; i < n; ++i) {
-      this->_alloc.construct(this->_arr + pos + i, *first);
+      this->_allocator.construct(this->_arr + pos + i, *first);
       ++first;
     }
   }
@@ -196,13 +206,6 @@ class vector {
       _size--;
     }
   }
-
-  reference back() { return data[_size - 1]; };
-  const_reference back() const { return data[_size - 1]; };
-
-  T &operator[](int const i) { return data[i]; }
-  T &operator[](int i) const { return data[i]; }
-  T &at(const int i) { return data[i]; }
 
   void remove(int x) {
     for (int i = x + 1; i < _size; i++) {
