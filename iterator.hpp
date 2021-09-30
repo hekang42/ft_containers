@@ -2,6 +2,13 @@
 #define ITERATOR
 // #include <iterator>
 namespace ft {
+
+struct input_iterator_tag {};
+struct output_iterator_tag {};
+struct forward_iterator_tag : input_iterator_tag, output_iterator_tag {};
+struct bidirectional_iterator_tag : forward_iterator_tag {};
+struct random_access_iterator_tag : bidirectional_iterator_tag {};
+
 template < class Iterator >
 class iterator_traits {
  public:
@@ -18,7 +25,7 @@ class iterator_traits< T* > {
   typedef T value_type;
   typedef T* pointer;
   typedef T& reference;
-  typedef typename std::random_access_iterator_tag iterator_category;
+  typedef random_access_iterator_tag iterator_category;
 };
 template < class T >
 class iterator_traits< const T* > {
@@ -27,7 +34,7 @@ class iterator_traits< const T* > {
   typedef T value_type;
   typedef const T* pointer;
   typedef const T& reference;
-  typedef typename std::random_access_iterator_tag iterator_category;
+  typedef random_access_iterator_tag iterator_category;
 };
 
 template < class Iterator >
@@ -61,7 +68,7 @@ class reverse_iterator {
     iterator_type iter = current;
     return *--iter;
   };
-  pointer operator->() const { return &(operator*()) };
+  pointer operator->() const { return &(operator*()); };
   reverse_iterator& operator++() {
     --current;
     return *this;
@@ -131,10 +138,10 @@ bool operator<=(const reverse_iterator< _Iter1 >& __x,
   return __x.base() >= __y.base();
 }
 
-template <class Iterator>
-  typename reverse_iterator<Iterator>::difference_type operator- (
-    const reverse_iterator<Iterator>& __x,
-    const reverse_iterator<Iterator>& __y){
+template < class Iterator >
+typename reverse_iterator< Iterator >::difference_type operator-(
+    const reverse_iterator< Iterator >& __x,
+    const reverse_iterator< Iterator >& __y) {
   return __y.base() - __x.base();
 }
 

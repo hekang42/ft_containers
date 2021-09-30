@@ -136,6 +136,19 @@ template < class T1, class T2 >
 bool operator>=(const pair< T1, T2 >& lhs, const pair< T1, T2 >& rhs) {
   return !(lhs < rhs);
 }
+template <bool flag, class IsTrue, class IsFalse>
+struct choose;
+
+template <class IsTrue, class IsFalse>
+struct choose<true, IsTrue, IsFalse>
+{
+	typedef IsTrue type;
+};
+template <class IsTrue, class IsFalse>
+struct choose<false, IsTrue, IsFalse>
+{
+	typedef IsFalse type;	
+};
 
 template < class InputIterator1, class InputIterator2 >
 bool equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2) {
