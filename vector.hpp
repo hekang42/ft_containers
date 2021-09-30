@@ -29,8 +29,11 @@ class vector {
     }
   }
 
-  void shift_elem_back(size_t pos, int n) {
-    for (int i = pos; i < _size; i++) data[_size - i + n] = data[_size - i];
+  void shift_elem_back(size_type pos, int n) {
+    for (size_type i = pos; i < _size; i++) data[_size - i + n] = data[_size - i];
+  }
+  void shift_elem_front(size_type pos, int n) {
+    for (size_type i = pos; i < _size; i++) data[pos + i] = data[pos + i + n];
   }
 
  public:
@@ -140,6 +143,41 @@ class vector {
   reference front() { return data[0]; };
   const_reference front() const { return data[9]; };
 
+  /* Modifiers */
+  /* range (1) */
+  template < class InputIterator >
+  void assign(InputIterator first, InputIterator last) {
+    this->clear();
+    this->insert(data[0], first, last);
+  }
+  /*fill (2) */
+  void assign(size_type n, const value_type &val) {
+    this->clear();
+    this->insert(data[0], n, val);
+  }
+
+  void push_back(T s) {
+    if (_capacity <= _size) {
+      T *temp = _allocator.allocate(_capacity * 2);
+      for (int i = 0; i < _size; i++) {
+        temp[i] = data[i];
+        _allocator.destroy(&(data + i));
+      }
+      _allocator.deallocate(data, _capacity);
+      data = temp;
+      _capacity *= 2;
+    }
+    data[_size] = s;
+    _size++;
+  }
+
+  void pop_back() {
+    if (_size > 0) {
+      data[_size - 1] = 0;
+      _size--;
+    }
+  }
+
   iterator insert(iterator position, const value_type &val) {
     size_type pos = position.p - data;
     if (_size == _capacity) expandCapacity();
@@ -179,46 +217,47 @@ class vector {
     }
   }
 
-  /* range (1) */
-  template < class InputIterator >
-  void assign(InputIterator first, InputIterator last);
-  /*fill (2) */
-  void assign(size_type n, const value_type &val);
-
-  void push_back(T s) {
-    if (_capacity <= _size) {
-      T *temp = new T[_capacity * 2];
-      for (int i = 0; i < _size; i++) {
-        temp[i] = data[i];
-        _allocator.destroy(&(data + i));
-      }
-      _allocator.deallocate(data, _capacity);
-      data = temp;
-      _capacity *= 2;
+  iterator erase(iterator position)
+  {
+    _allocator.destroy(position);
+    shift_elem_front(position, 1);
+    return (position);
+  }
+  iterator erase(iterator first, iterator last)
+  {
+    int n = 0;
+    for (iterator i = first; i !=last; ++i)
+    {
+      _allocator.destroy(i);
+      ++n;
     }
-    data[_size] = s;
-    _size++;
+    shift_elem_front(position, n);
+    return (position);    
   }
 
-  void pop_back() {
-    if (_size > 0) {
-      data[_size - 1] = 0;
-      _size--;
-    }
+
+  void clear() {
+    for (size_type i = 0; i < _size; ++i) _allocator.destroy(data + i);
+    _size = 0;
   }
+/* Allocator */
+  allocator_type get_allocator() const { return (_allocator); }
 
-  void remove(int x) {
-    for (int i = x + 1; i < _size; i++) {
-      data[i - 1] = data[i];
-    }
-    _size--;
-  };
-
+/* Non-member function overloads */
   void swap(vector &x) {
     vector temp(x);
     x = *this;
     *this = temp;
   };
+
+
+
+  // void remove(int x) {
+  //   for (int i = x + 1; i < _size; i++) {
+  //     data[i - 1] = data[i];
+  //   }
+  //   _size--;
+  // };
 
   vector &operator=(const vector &other) {
     this->data = other.data;
@@ -228,6 +267,35 @@ class vector {
   };
 };
 
+template <class T, class Alloc>
+  bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+  {
+    return (equal(lhs->begin(), lhs->end(), rhs->begin());
+  }
+template <class T, class Alloc>
+  bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+    return (!(lhs==rhs));
+  }
+template <class T, class Alloc>
+  bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+  {
+    return (lexicographical_compare(lhs->begin(), lhs->end(), rhs->begin(), rhs->end()));
+  }
+template <class T, class Alloc>
+  bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+  {
+    return (!(rhs < lhs));
+  }
+template <class T, class Alloc>
+  bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+  {
+    return (rhs < lhs);
+  }
+template <class T, class Alloc>
+  bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+  {
+    return (!(lhs<rhs));
+  }
 }  // namespace ft
 
 #endif
