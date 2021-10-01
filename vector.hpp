@@ -291,9 +291,9 @@ namespace ft
     /* Non-member function overloads */
     void swap(vector &x)
     {
-      vector temp(x);
-      x = *this;
-      *this = temp;
+      this->data = x.data;
+      this->_size = x._size;
+      this->_capacity = x._capacity;
     };
 
     // void remove(int x) {
