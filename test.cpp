@@ -159,25 +159,43 @@
 //   return 0;
 // }
 
-#include <iostream>
-#include <vector>
+// #include <iostream>
+// #include <vector>
+// #include "vector.hpp"
+
+// int main ()
+// {
+//   ft::vector<int> myvector;
+//   int sum (0);
+//   myvector.push_back (100);
+//   myvector.push_back (200);
+//   myvector.push_back (300);
+
+//   while (!myvector.empty())
+//   {
+//     sum+=myvector.back();
+//     myvector.pop_back();
+//   }
+
+//   std::cout << "The elements of myvector add up to " << sum << '\n';
+
+//   return 0;
+// }
+
 #include "vector.hpp"
+#include <list>
+#include <vector>
+#include <iostream>
+typedef std::vector<std::string> strlist;
 
-int main ()
+int	main()
 {
-  ft::vector<int> myvector;
-  int sum (0);
-  myvector.push_back (100);
-  myvector.push_back (200);
-  myvector.push_back (300);
-
-  while (!myvector.empty())
-  {
-    sum+=myvector.back();
-    myvector.pop_back();
-  }
-
-  std::cout << "The elements of myvector add up to " << sum << '\n';
-
-  return 0;
+	strlist::iterator	it;
+	strlist	sv(4, "asfd");
+	ft::vector<strlist>	vec(4, sv);
+	ft::vector<strlist>::iterator it2;
+	it = (vec.begin())->begin();
+	
+	std::cout << *it << std::endl;
+	return (0);
 }

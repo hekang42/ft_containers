@@ -54,6 +54,7 @@ class reverse_iterator {
    * @brief aqsdasdas
    */
   reverse_iterator() : current(){};
+  ~reverse_iterator() {};
   /**
    * @brief aqsdasdas
    * @param it asdasdss
