@@ -66,7 +66,6 @@ namespace ft
 
   public:
     /* Construct */
-    // vector(unsigned int n = 1) : data(new T[n]), _capacity(n), _size(0){};
     /* default */
     explicit vector(const allocator_type &alloc = allocator_type())
     {
