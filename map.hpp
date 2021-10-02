@@ -33,7 +33,7 @@ class map {
 	key_compare _comp;
 	allocator_type _alloc;
 	size_type _size;
-	RBTREE*
+	// RBTREE*
 
 public:
 
