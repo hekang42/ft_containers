@@ -5,7 +5,7 @@
 #include "utils.hpp"
 namespace ft {
 //bidirectional iterator
-template < typename T, bool IsConst >
+template < typename T, class Compare, bool IsConst >
 class MapIterator {
  public:
   typedef T value_type;
@@ -19,6 +19,14 @@ class MapIterator {
   MapIterator(T *x = NULL) : p(x){};
   MapIterator(const MapIterator< T, false > &other) : p(other.p){};
   ~MapIterator(){};
+
+
+  void bInsert(value_type)
+
+
+
+
+
 
   MapIterator &operator=(const MapIterator &other) {
     if (this != &other) this->p = other.p;

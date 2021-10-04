@@ -55,6 +55,15 @@ public:
   map(const map& other){};
   map& operator=(const map& other){};
   ~map();
+
+/* single element (1) */
+pair<iterator,bool> insert (const value_type& val);
+/* with hint (2) */
+iterator insert (iterator position, const value_type& val);
+/* range (3) */
+template <class InputIterator>
+  void insert (InputIterator first, InputIterator last);
+
 };
 
 template < class T >
