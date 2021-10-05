@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "MapIterator.hpp"
+#include "utils.hpp"
 namespace ft {
 template < class T, class Compare, bool IsConst >
 class MapIterator;
@@ -114,9 +115,9 @@ class BTree {
     if (_comp(value, node) == 0)
       return node;
     else if (_comp(value, node) == 1)
-      internal_find(node->_left, value);
+      return internal_find(node->_left, value);
     else
-      internal_find(node->_right, value);
+      return internal_find(node->_right, value);
   }
 
 

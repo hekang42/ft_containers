@@ -20,14 +20,6 @@ class MapIterator {
   MapIterator(const MapIterator< T, false > &other) : p(other.p){};
   ~MapIterator(){};
 
-
-  void bInsert(value_type)
-
-
-
-
-
-
   MapIterator &operator=(const MapIterator &other) {
     if (this != &other) this->p = other.p;
     return *this;
