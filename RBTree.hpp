@@ -16,7 +16,7 @@ class RbTree {
   typedef MapIterator< T, Compare, false > iterator;
   typedef MapIterator< T, Compare, true > const_iterator;
 
-  node *__root;
+  node *_root;
 
   value_compare _comp;
   typedef std::allocator< Node > _nodeAlloc;

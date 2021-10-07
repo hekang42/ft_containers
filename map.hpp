@@ -2,10 +2,10 @@
 #define MAP_HPP
 #include <memory>
 
+#include "BTree.hpp"
 #include "MapIterator.hpp"
 #include "iterator.hpp"
 #include "utils.hpp"
-#include "BTree.hpp"
 namespace ft {
 template < class Key, class T, class Compare = less< Key >,
            class Alloc = std::allocator< ft::pair< const Key, T > > >
@@ -37,42 +37,83 @@ class map {
   typedef typename allocator_type::const_reference const_reference;
   typedef typename allocator_type::pointer pointer;
   typedef typename allocator_type::const_pointer const_pointer;
-  typedef typename ft::BTree< value_type, value_compare, allocator_type >::iterator iterator;
-  typedef typename ft::BTree< value_type, value_compare, allocator_type >::const_iterator const_iterator;
+  typedef
+      typename ft::BTree< value_type, value_compare, allocator_type >::iterator
+          iterator;
+  typedef typename ft::BTree< value_type, value_compare,
+                              allocator_type >::const_iterator const_iterator;
   typedef ft::reverse_iterator< iterator > reverse_iterator;
   typedef ft::reverse_iterator< const_iterator > const_reverse_iterator;
   typedef
       typename ft::iterator_traits< iterator >::difference_type difference_type;
   typedef typename allocator_type::size_type size_type;
 
+  typedef typename Alloc::template rebind<
+      BTree< value_type, value_compare, allocator_type > >::other AlTree;
+  typedef typename BTree< value_type, value_compare, allocator_type >::TreeNode
+      TreeNode;
+
  private:
   key_compare _comp;
   allocator_type _alloc;
   size_type _size;
-  BTree< value_type, value_compare, allocator_type>* _btree;
+  BTree< value_type, value_compare, allocator_type >* _btree;
 
  public:
   /* Construct Map */
   /* empty (1) */
   explicit map(const key_compare& comp = key_compare(),
-               const allocator_type& alloc = allocator_type()){
-	
+               const allocator_type& alloc = allocator_type())
+      : _comp(comp), _alloc(alloc), _size(0) {
+    AlTree _treealloc;
+    this->_btree = _treealloc.allocate(1);
+    _treealloc.construct(this->_btree,
+                         BTree< value_type, value_compare, allocator_type >(
+                             value_compare(this->_comp)));
   };
   /* range (2) */
   template < class InputIterator >
   map(InputIterator first, InputIterator last,
       const key_compare& comp = key_compare(),
-      const allocator_type& alloc = allocator_type());
+      const allocator_type& alloc = allocator_type())
+      : _comp(comp), _alloc(alloc), _size(0) {
+    AlTree _treeAlloc;
+    this->_btree = _treeAlloc.allocate(1);
+    _treeAlloc.construct(this->_btree,
+                         BTree< value_type, value_compare, allocator_type >(
+                             value_compare(this->_comp)));
+    this->insert(first, last);
+  };
   /* copy (3) */
-  map(const map& x);
+  map(const map& x) : _comp(x._comp), _alloc(x._alloc), _size(x._size) {
+    AlTree _treeAlloc;
+    this->_tree = _treeAlloc.allocate(1);
+    _treeAlloc.construct(this->_btree, *(x._tree));
+  };
 
-  map(/* args*/);
-  map(const map& other){};
-  map& operator=(const map& other){};
-  ~map();
+  map& operator=(const map& other) {
+    if (this != other) {
+      *(this->_btree) = *(other._btree);
+      this->size = other._size;
+    }
+    return (*this);
+  }
+  ~map() {
+    AlTree _treeAlloc;
+    _treeAlloc.destroy(this->_tree);
+    _treeAlloc.deallocate(this->_tree, 1);
+  };
 
   /* single element (1) */
-  pair< iterator, bool > insert(const value_type& val);
+  pair< iterator, bool > insert(const value_type& val) {
+    pair< TreeNode*, bool > ret = this->_btree->insert(val);
+    if (ret.second == true) {
+      ++this->_size;
+        return (pair<iterator, bool>(iterator(ret.first, this->_btree), true)));
+    } else {
+        return (pair<iterator, bool>(iterator(ret.first, this->_btree), false)));
+    }
+  }
   /* with hint (2) */
   iterator insert(iterator position, const value_type& val);
   /* range (3) */

@@ -2,20 +2,17 @@
 #define UTILS_HPP
 namespace ft {
 
-	
+
 template < typename T >
 struct Node {
   typedef T value_type;
   value_type data;
-  int color;
   Node *left;
   Node *right;
   Node *parent;
-  explicit Node(value_type);
 
   Node(T data) {
     this->data = data;
-    this->color = RED;
 
     this->left = nullptr;
     this->right = nullptr;
