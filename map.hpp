@@ -87,8 +87,8 @@ class map {
   /* copy (3) */
   map(const map& x) : _comp(x._comp), _alloc(x._alloc), _size(x._size) {
     AlTree _treeAlloc;
-    this->_tree = _treeAlloc.allocate(1);
-    _treeAlloc.construct(this->_btree, *(x._tree));
+    this->_btree = _treeAlloc.allocate(1);
+    _treeAlloc.construct(this->_btree, *(x._btree));
   };
 
   map& operator=(const map& other) {
@@ -104,28 +104,30 @@ class map {
     _treeAlloc.deallocate(this->_tree, 1);
   };
 
+  /* member function */
+  iterator begin() { return iterator(findMinNode(_btree)); }
+  const_iterator begin() const { return const_iterator(findMinNode(_btree)); };
+
   /* single element (1) */
   pair< iterator, bool > insert(const value_type& val) {
     pair< TreeNode*, bool > ret = this->_btree->insert(val);
     if (ret.second == true) {
       ++this->_size;
-        return (pair<iterator, bool>(iterator(ret.first, this->_btree), true)));
+      return (pair< iterator, bool >(iterator(ret.first, this->_btree), true));
     } else {
-        return (pair<iterator, bool>(iterator(ret.first, this->_btree), false)));
+      return (pair< iterator, bool >(iterator(ret.first, this->_btree), false));
     }
   }
   /* with hint (2) */
-  iterator insert(iterator position, const value_type& val);
+  iterator insert(iterator position, const value_type& val) {
+    (void)position;
+    return (insert(val).first);
+  }
   /* range (3) */
   template < class InputIterator >
-  void insert(InputIterator first, InputIterator last);
+  void insert(InputIterator first, InputIterator last) {
+    for (InputIterator i = first; i != last; ++i) insert(&*i);
+  }
 };
-
-template < class T >
-struct less : binary_function< T, T, bool > {
-  bool operator()(const T& x, const T& y) const { return x < y; }
-};
-
 }  // namespace ft
-
 #endif

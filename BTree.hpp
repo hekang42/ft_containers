@@ -11,11 +11,6 @@ class MapIterator;
 
 template < class T, class Compare, class Alloc = std::allocator< T > >
 class BTree {
- private:
-  bool _isNodeParentLeft(TreeNode* node) {
-    return (node->_parent->_left == node);
-  }
-
  public:
   typedef T value_type;
   typedef Compare value_compare;
@@ -34,24 +29,32 @@ class BTree {
         : _value(value), _parent(NULL), _left(NULL), _right(NULL) {}
   };
 
+ private:
+  bool _isNodeParentLeft(TreeNode* node) {
+    return (node->_parent->_left == node);
+  }
+
+ public:
+  //   typedef std::allocator< TreeNode > _nodeAlloc;
+  typedef typename Alloc::template rebind< TreeNode >::other _Alnod;
   TreeNode* _root;
-  typedef std::allocator< TreeNode > _nodeAlloc;
   TreeNode* _leaf;
 
+  _Alnod _nodeAlloc;
   BTree(const value_compare comp) : _comp(comp) {
     _leaf = _nodeAlloc.allocate(1);
     _nodeAlloc.construct(_leaf, TreeNode());
     _root = _leaf;
   }
 
-  BTree(const BTree& other) : _comp(other._comp), _alloc(other._alloc) {
+  BTree(const BTree& other) : _comp(other._comp), _nodeAlloc(other._nodeAlloc) {
     _leaf = _nodeAlloc.allocate(1);
     _nodeAlloc.construct(_leaf, TreeNode());
     _root = _leaf;
 
     copy_tree(other, other._root);
   };
-  BTree& operator=(const BTree& other){} {
+  BTree& operator=(const BTree& other) {
     if (this != other) {
       clear_tree(this->_root);
       copy_tree(other, other.root);
@@ -64,17 +67,17 @@ class BTree {
     _nodeAlloc.deallocate(_root, 1);
   }
 
-  void copy_tree(const Btree& other, TreeNode* node) {
+  void copy_tree(const BTree& other, TreeNode* node) {
     if (node == other._leaf) return;
     insert(node->_value);
-    copy_tree(other, node._left);
-    copy_tree(other, node._right);
+    copy_tree(other, node->_left);
+    copy_tree(other, node->_right);
   }
 
   void clear_tree(TreeNode* node) {
-    if (node == this._leaf) return;
-    clear_tree(node._left);
-    clear_tree(node._right);
+    if (node == this->_leaf) return;
+    clear_tree(node->_left);
+    clear_tree(node->_right);
 
     if (this->_isNodeParentLeft(node))  // 지우려는 노드가 부모의 왼쪽인지
                                         // 오른쪽인지 파악하여 link 끊어준다
@@ -93,10 +96,10 @@ class BTree {
     // recursive
     if (node == _leaf) {
       node = _nodeAlloc.construct(value, 1);
-      return;
+      return (pair< TreeNode*, bool >(node, true));
     }
     if (!_comp(value, node) && !_comp(node, value))
-      return (pair<TreeNode*, bool>(node, false));
+      return (pair< TreeNode*, bool >(node, false));
     else if (_comp(value, node) == 1)
       return (internal_insert(node->_left, value));
     else
@@ -118,34 +121,42 @@ class BTree {
       return internal_find(node->_right, value);
   }
 
-  TreeNode* findMinNode(Node* root) {
+  TreeNode* findMinNode(TreeNode* root) {
     TreeNode* tmp = root;
     while (tmp->_left != NULL) tmp = tmp->_left;
     return tmp;
   }
 
-  TreeNode* delete (T value) {
+  TreeNode* deleteNode(T value) {
     TreeNode* tNode = NULL;
     if (_root == NULL) return NULL;
 
     if (_root->_value > value) {
       _root->_left = delete (_root->_left, value);
-      else if (_root->value < value) _root->_right =
-          delete (_root->_right, value);
-      else {
-        if (_root->_right != NULL && _root->_left != NULL) {
-          tNode = findMinNode(_root->_right);
-          _root->_value = tNode->_value;
-          _root->_right = delete (_root->_right, tNode->_value);
-        } else {
-          tNode = (_root->_left == NULL) ? _root->_right : _root->_left;
-          free(_root);
-          return tNode;
-        }
+    } else if (_root->value < value)
+      _root->_right = delete (_root->_right, value);
+    else {
+      if (_root->_right != NULL && _root->_left != NULL) {
+        tNode = findMinNode(_root->_right);
+        _root->_value = tNode->_value;
+        _root->_right = delete (_root->_right, tNode->_value);
+      } else {
+        tNode = (_root->_left == NULL) ? _root->_right : _root->_left;
+        free(_root);
+        return tNode;
       }
-      return _root;
     }
+    return _root;
   }
 };
-}  // namespace ft
+
+//   TreeNode* MinNode(TreeNode* node)
+//   {
+// 	  if (node->_left == nullptr)
+// 	  	return (node);
+// 	else
+// 		return (MinNode(node->left));
+//   }
+};
+  // namespace ft
 #endif  // BTREE_HPP

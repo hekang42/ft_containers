@@ -17,7 +17,7 @@ class MapIterator {
   pointer p;
 
   MapIterator(T *x = NULL) : p(x){};
-  MapIterator(const MapIterator< T, false > &other) : p(other.p){};
+  MapIterator(const MapIterator< T, Compare, false > &other) : p(other.p){};
   ~MapIterator(){};
 
   MapIterator &operator=(const MapIterator &other) {
@@ -45,16 +45,16 @@ class MapIterator {
     return tmp;
   }
 
-  bool operator==(const MapIterator< T, true > &rhs) const {
+  bool operator==(const MapIterator< T, Compare, true > &rhs) const {
     return p == rhs.p;
   }
-  bool operator==(const MapIterator< T, false > &rhs) const {
+  bool operator==(const MapIterator< T, Compare, false > &rhs) const {
     return p == rhs.p;
   }
-  bool operator!=(const MapIterator< T, true > &rhs) const {
+  bool operator!=(const MapIterator< T, Compare, true > &rhs) const {
     return p != rhs.p;
   }
-  bool operator!=(const MapIterator< T, false > &rhs) const {
+  bool operator!=(const MapIterator< T, Compare, false > &rhs) const {
     return p != rhs.p;
   }
   reference operator*() { return *p; }

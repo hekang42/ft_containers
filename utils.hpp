@@ -1,5 +1,6 @@
 #if !defined(UTILS_HPP)
 #define UTILS_HPP
+#include <iostream>
 namespace ft {
 
 
@@ -10,14 +11,6 @@ struct Node {
   Node *left;
   Node *right;
   Node *parent;
-
-  Node(T data) {
-    this->data = data;
-
-    this->left = nullptr;
-    this->right = nullptr;
-    this->parent = nullptr;
-  }
 };
 template < bool, typename T = void >
 struct enable_if {
@@ -213,6 +206,17 @@ bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
     ++first2;
   }
   return (first2 != last2);
+};
+template <class Arg1, class Arg2, class Result>
+  struct binary_function {
+    typedef Arg1 first_argument_type;
+    typedef Arg2 second_argument_type;
+    typedef Result result_type;
+  };
+
+template < class T >
+struct less : binary_function< T, T, bool > {
+  bool operator()(const T& x, const T& y) const { return x < y; }
 };
 }  // namespace ft
 
