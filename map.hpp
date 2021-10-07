@@ -105,8 +105,63 @@ class map {
   };
 
   /* member function */
-  iterator begin() { return iterator(findMinNode(_btree)); }
-  const_iterator begin() const { return const_iterator(findMinNode(_btree)); };
+  iterator begin() { return iterator(_btree.findMinNode(_btree)); }
+  const_iterator begin() const {
+    return const_iterator(_btree.findMinNode(_btree));
+  };
+
+  void clear() {
+    _btree->clear_tree();
+    _size = 0;
+  }
+
+  size_type count(const key_type& k) const {
+    if (_btree->find(k))
+      return (1);
+    else
+      return (0);
+  }
+
+  bool empty() const {
+    if (_size)
+      return true;
+    else
+      return false;
+  }
+  iterator end() { return (iterator(_btree.findMaxNode(_btree))); }
+  const_iterator end() const {
+    return (const_iterator(_btree.findMaxNode(_btree)));
+  }
+
+  pair< const_iterator, const_iterator > equal_range(const key_type& k) const {
+    return make_pair< const_iterator, const_iterator >(lower_bound(k),
+                                                       upper_bound(k));
+  }
+  pair< iterator, iterator > equal_range(const key_type& k) {
+    return make_pair< iterator, iterator >(lower_bound(k), upper_bound(k));
+  }
+
+  iterator lower_bound(const key_type& k) {
+    iterator it = begin();
+    while (_comp(*it, k) && it != end()) ++it;
+    return (it);
+  }
+  const_iterator lower_bound(const key_type& k) const {
+    const_iterator it = begin();
+    while (_comp(*it, k) && it != end()) ++it;
+    return (it);
+  }
+
+  iterator upper_bound(const key_type& k) {
+    iterator it = begin();
+    while (!_comp(*it, k) && it != end()) ++it;
+    return (it);
+  }
+  const_iterator upper_bound(const key_type& k) const {
+    const_iterator it = begin();
+    while (!_comp(*it, k) && it != end()) ++it;
+    return (it);
+  }
 
   /* single element (1) */
   pair< iterator, bool > insert(const value_type& val) {

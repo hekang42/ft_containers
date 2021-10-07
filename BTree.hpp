@@ -127,6 +127,12 @@ class BTree {
     return tmp;
   }
 
+  TreeNode* findMaxNode(TreeNode* root) {
+    TreeNode* tmp = root;
+    while (tmp->_right != NULL) tmp = tmp->_right;
+    return tmp;
+  }
+
   TreeNode* deleteNode(T value) {
     TreeNode* tNode = NULL;
     if (_root == NULL) return NULL;
@@ -157,6 +163,6 @@ class BTree {
 // 	else
 // 		return (MinNode(node->left));
 //   }
-};
-  // namespace ft
+};  // namespace ft
+    // namespace ft
 #endif  // BTREE_HPP
