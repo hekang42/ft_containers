@@ -9,6 +9,18 @@ namespace ft {
 template < class T, class Compare, bool IsConst >
 class MapIterator;
 
+template < typename T >
+struct TreeNode {
+  value_type _value;
+  TreeNode* _parent;
+  TreeNode* _left;
+  TreeNode* _right;
+
+  TreeNode() : _value(value_type()), _parent(NULL), _left(NULL), _right(NULL) {}
+  TreeNode(value_type value)
+      : _value(value), _parent(NULL), _left(NULL), _right(NULL) {}
+};
+
 template < class T, class Compare, class Alloc = std::allocator< T > >
 class BTree {
  public:
@@ -17,17 +29,6 @@ class BTree {
   typedef MapIterator< T, Compare, false > iterator;
   typedef MapIterator< T, Compare, true > const_iterator;
   value_compare _comp;
-
-  struct TreeNode {
-    T _value;
-    TreeNode* _parent;
-    TreeNode* _left;
-    TreeNode* _right;
-
-    TreeNode() : _value(T()), _parent(NULL), _left(NULL), _right(NULL) {}
-    TreeNode(T value)
-        : _value(value), _parent(NULL), _left(NULL), _right(NULL) {}
-  };
 
  private:
   bool _isNodeParentLeft(TreeNode* node) {
@@ -136,33 +137,98 @@ class BTree {
   TreeNode* deleteNode(T value) {
     TreeNode* tNode = NULL;
     if (_root == NULL) return NULL;
-
     if (_root->_value > value) {
-      _root->_left = delete (_root->_left, value);
+      _root->_left = deleteNode(_root->_left, value);
     } else if (_root->value < value)
-      _root->_right = delete (_root->_right, value);
+      _root->_right = deleteNode(_root->_right, value);
     else {
       if (_root->_right != NULL && _root->_left != NULL) {
         tNode = findMinNode(_root->_right);
         _root->_value = tNode->_value;
-        _root->_right = delete (_root->_right, tNode->_value);
+        _root->_right = deleteNode(_root->_right, tNode->_value);
       } else {
         tNode = (_root->_left == NULL) ? _root->_right : _root->_left;
-        free(_root);
+        _Alnod.destroy(_root);
+        _Alnod.deallocate(_root);
         return tNode;
       }
     }
     return _root;
   }
+
+  TreeNode* succesor(TreeNode* p) {
+    if (p->_right != NULL) return findMinNode(p->_right);
+    TreeNode* q = p->_parent;
+    while (q != NULL && q->right == p) {
+      p = q;
+      q = q->_parent;
+    }
+    return q;
+  }
+
+  TreeNode* deleteNode(TreeNode* node, value_type value) {
+    if (node->_value > value)
+      deleteNode(node->_left, value);
+    else if (node->_value < value)
+      deleteNode(node->_right, value);
+    else {
+      if (node->_left != NULL &&
+          node->_right != NULL)  // 자식이 둘 다 있을 경우
+      {
+        TreeNode* p = succesor(node);
+        TreeNode* p_parent = p->_parent;
+        node->_value = p->_value;
+        if (p_parent->_left == p) {
+          p_parent->_left = NULL;
+        } else if (p_parent->_right == p) {
+          p_parent->_right = NULL;
+        }
+        _Alnod.destroy(p);
+        _Alnod.deallocate(p);
+      }
+
+      else if (node->_left == NULL && node->_right == NULL)  // 자식이 없는 경우
+      {
+        if (node->_parent->_left == node) {
+          node->_parent->_left = NULL;
+          _Alnod.destroy(node);
+          _Alnod.deallocate(node);
+        }
+        if (node->_parent->_right == node) {
+          node->_parent->_right = NULL;
+          _Alnod.destroy(node);
+          _Alnod.deallocate(node);
+        }
+      } else if (node->_left == NULL ||
+                 node->_right == NULL)  // 자식이 하나 있는 경우
+      {
+        if (node->_left == NULL) {
+          if (node->_parent->left == node) {
+            node->_parent->left = node->_right;
+            node->_right->_parent = node->_parent;
+          } else
+            (node->_parent->_right == node) {
+              node->_parent->right = node->_right;
+              node->_right->_parent = node->_parent;
+            }
+        } else if (node->_left == NULL) {
+          if (node->_parent->left == node) {
+            node->_parent->left = node->_left;
+            node->_left->_parent = node->_parent;
+          } else
+            (node->_parent->_right == node) {
+              node->_parent->right = node->_left;
+              node->_left->_parent = node->_parent;
+            }
+        }
+        _Alnod.destroy(node);
+        _Alnod.deallocate(node);
+      }
+    }
+  }
+  return node;
 };
 
-//   TreeNode* MinNode(TreeNode* node)
-//   {
-// 	  if (node->_left == nullptr)
-// 	  	return (node);
-// 	else
-// 		return (MinNode(node->left));
-//   }
-};  // namespace ft
-    // namespace ft
+};      // namespace ft
+        // namespace ft
 #endif  // BTREE_HPP

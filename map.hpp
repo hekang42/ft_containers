@@ -163,6 +163,17 @@ class map {
     return (it);
   }
 
+	void erase (iterator position){
+		
+	}
+	size_type erase (const key_type &k){
+		_btree->deleteNode(k);
+		return (_size);
+	}
+	void erase (iterator first, iterator last){
+
+	}
+
   /* single element (1) */
   pair< iterator, bool > insert(const value_type& val) {
     pair< TreeNode*, bool > ret = this->_btree->insert(val);
