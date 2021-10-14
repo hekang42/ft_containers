@@ -22,51 +22,90 @@ struct TreeNode {
 };
 
 template < class T, class Compare, class Alloc = std::allocator< T > >
-class BTree {
+class BinaryTree {
+ private:
+  typedef BinaryTree btree;
+  typedef ft::TreeNode< T > node_type;
+  typedef ft::TreeNode< T >* node_pointer;
+  typedef typename Alloc::template rebind< TreeNode >::other node_alloc_type;
+
  public:
   typedef T value_type;
   typedef Compare value_compare;
-  typedef MapIterator< T, Compare, false > iterator;
-  typedef MapIterator< T, Compare, true > const_iterator;
-  value_compare _comp;
+  typedef Alloc allocator_type;
+  typedef typename allocator_type::reference reference;
+  typedef typename allocator_type::const_reference const_reference;
+  typedef typename allocator_type::pointer pointer;
+  typedef typename allocator_type::const_pointer const_pointer;
+  typedef ft::MapIterator< T, Compare, false > iterator;
+  typedef ft::MapIterator< T, Compare, true > const_iterator;
+  typedef ft::reverse_iterator< iterator > reverse_iterator;
+  typedef ft::reverse_iterator< const_iterator > const_reverse_iterator;
+  typedef size_t size_type;
 
  private:
   bool _isNodeParentLeft(TreeNode* node) {
     return (node->_parent->_left == node);
   }
+  value_compare _comp;
+  node_pointer _root;
+  size_type _size;
+  node_alloc_type _nodeAlloc;
+  allocator_type _alloc;
 
  public:
-  //   typedef std::allocator< TreeNode > _nodeAlloc;
-  typedef typename Alloc::template rebind< TreeNode >::other _Alnod;
-  TreeNode* _root;
-  TreeNode* _leaf;
-
-  _Alnod _nodeAlloc;
-  BTree(const value_compare comp) : _comp(comp) {
-    _leaf = _nodeAlloc.allocate(1);
-    _nodeAlloc.construct(_leaf, TreeNode());
-    _root = _leaf;
+  BTree(const value_compare const& comp, allocate_type const& alloc,
+        node_alloc_type const& node_alloc = node_alloc_type())
+      : _comp(comp), _alloc(alloc), _node_alloc(node_alloc), _size(0) {
+    _root = _nodeAlloc.allocate(1);
+    _nodeAlloc.construct(_root, TreeNode());
   }
 
-  BTree(const BTree& other) : _comp(other._comp), _nodeAlloc(other._nodeAlloc) {
-    _leaf = _nodeAlloc.allocate(1);
+  BTree(const BTree& other)
+      : _comp(other._comp),
+        _alloc(other._alloc),
+        _nodeAlloc(other._nodeAlloc),
+        _size(other._size) {
+    _root = _nodeAlloc.allocate(1);
     _nodeAlloc.construct(_leaf, TreeNode());
-    _root = _leaf;
-
     copy_tree(other, other._root);
-  };
+  }
+
   BTree& operator=(const BTree& other) {
     if (this != other) {
       clear_tree(this->_root);
+      this->_comp = ref._comp;
+      this->_alloc = ref._alloc;
+      this->_node_alloc = ref._node_alloc;
       copy_tree(other, other.root);
+      this->_size = ref._size;
     }
     return (*this);
   }
+
   ~BTree() {
     clear_tree(this->_root);
     _nodeAlloc.destroy(_root);
     _nodeAlloc.deallocate(_root, 1);
   }
+
+  // Iterator;
+  iterator begin() { return (iterator(minValueNode(_root))); }
+  const_iterator begin() const { return (const_iterator(minValueNode(_root))); }
+  iterator end() { return (iterator(_root)); }
+  const_iterator end() const { return (const_iterator(_root)); }
+  reverse_iterator rbegin() { return (reverse_iterator(end())); }
+  const_reverse_iterator rbegin() const {
+    return (const_reverse_iterator(end()));
+  }
+  reverse_iterator rend() { return (reverse_iterator(begin())); }
+  const_reverse_iterator rend() const {
+    return (const_reverse_iterator(begin()));
+  }
+  // Capacity
+  bool empty() const { return (this->_size == 0); }
+  size_type size() const { return (this->_size); }
+  size_type max_size() const { return (_nodeAlloc.max_size()); }
 
   void copy_tree(const BTree& other, TreeNode* node) {
     if (node == other._leaf) return;
@@ -89,18 +128,37 @@ class BTree {
     _nodeAlloc.deallocate(node, 1);
   }
 
-  pair< TreeNode*, bool > insert(value_type value) {
+  pair< iterator, bool > insert(const value_type& value) {
     return internal_insert(_root, value);
   }
+  iterator insert(iterator position, const value_type& val) {
+    (void)position;
+    return (internal_insert(_root, val).first);
+  }
+  template < class InputIterator >
+  void insert(InputIterator first, InputIterator last) {
+    while (first != last) {
+      internal_insert(_root, *first);
+      first++;
+    }
+  }
 
-  pair< TreeNode*, bool > internal_insert(TreeNode* node, value_type value) {
+  void erase(const_iterator position) { deleteNode(*position); }
+  size_type erase(const value_type& k) { return (deleteNode(k)); }
+  void erase(const_iterator first, const_iterator last) {
+    for (const_iterator it = first; it != last; it++) erase(it);
+  }
+
+  ft::pair< iterator, bool > internal_insert(node_pointer node,
+                                             value_type value) {
     // recursive
-    if (node == _leaf) {
+    if (node == NULL) {
       node = _nodeAlloc.construct(value, 1);
-      return (pair< TreeNode*, bool >(node, true));
+			++_size;
+      return (ft::make_pair(iterator(node), true));
     }
     if (!_comp(value, node) && !_comp(node, value))
-      return (pair< TreeNode*, bool >(node, false));
+      return (ft::make_pair(iterator(node), false));
     else if (_comp(value, node) == 1)
       return (internal_insert(node->_left, value));
     else
@@ -148,8 +206,9 @@ class BTree {
         _root->_right = deleteNode(_root->_right, tNode->_value);
       } else {
         tNode = (_root->_left == NULL) ? _root->_right : _root->_left;
-        _Alnod.destroy(_root);
-        _Alnod.deallocate(_root);
+        _nodeAlloc.destroy(_root);
+        _nodeAlloc.deallocate(_root);
+				--_size;
         return tNode;
       }
     }
@@ -183,21 +242,21 @@ class BTree {
         } else if (p_parent->_right == p) {
           p_parent->_right = NULL;
         }
-        _Alnod.destroy(p);
-        _Alnod.deallocate(p);
+        node_alloc_type.destroy(p);
+        node_alloc_type.deallocate(p);
       }
 
       else if (node->_left == NULL && node->_right == NULL)  // 자식이 없는 경우
       {
         if (node->_parent->_left == node) {
           node->_parent->_left = NULL;
-          _Alnod.destroy(node);
-          _Alnod.deallocate(node);
+          node_alloc_type.destroy(node);
+          node_alloc_type.deallocate(node);
         }
         if (node->_parent->_right == node) {
           node->_parent->_right = NULL;
-          _Alnod.destroy(node);
-          _Alnod.deallocate(node);
+          node_alloc_type.destroy(node);
+          node_alloc_type.deallocate(node);
         }
       } else if (node->_left == NULL ||
                  node->_right == NULL)  // 자식이 하나 있는 경우
@@ -221,12 +280,30 @@ class BTree {
               node->_left->_parent = node->_parent;
             }
         }
-        _Alnod.destroy(node);
-        _Alnod.deallocate(node);
+        node_alloc_type.destroy(node);
+        node_alloc_type.deallocate(node);
       }
     }
+    return node;
   }
-  return node;
+
+  void swap(btree& x) {
+    if (this == &x) return;
+    value_compare tmp_comp = x._comp;
+    node_alloc_type tmp_node_alloc = x._node_alloc;
+    node_pointer tmp_meta_node = x._meta_node;
+    size_type tmp_size = x._size;
+
+		x._comp = this->_comp;
+		x._node_alloc = this->_node_alloc;
+		x._meta_node = this->_meta_node;
+		x._size = this->_size;
+
+		this->_comp = tmp_comp;
+		this->_node_alloc = tmp_node_alloc;
+		this->_meta_node = tmp_meta_node;
+		this->_size = tmp_size;
+  }
 };
 
 };      // namespace ft
