@@ -3,7 +3,11 @@
 
 #include "iterator.hpp"
 #include "utils.hpp"
+#include "BTree.hpp"
 namespace ft {
+
+template < typename T >
+struct TreeNode;
 // bidirectional iterator
 template < typename T, class Compare, bool IsConst >
 class MapIterator {
